@@ -1,137 +1,89 @@
+// 選中所有商品
+var product = document.querySelectorAll('.product')
 // 計算區域
-var minus = document.querySelectorAll('.minus')
-var plus = document.querySelectorAll('.plus')
-var count = document.querySelectorAll('#count')
+var minus = document.querySelectorAll('.minus');
+var plus = document.querySelectorAll('.plus');
+var input = document.querySelectorAll('input');
 // 顯示區域
-var amount = document.querySelector('.amount')
-var subTotal = document.querySelector('.subtotal')
-var shipping = document.querySelector('.shipping')
-var totalCost = document.querySelector('.totalcost')
+var showProductQty = document.querySelector('.amount');
+var showSubtotal = document.querySelector('.subtotal');
+var shipping = document.querySelector('.shipping');
+var totalCost = document.querySelector('.totalcost');
 // 商品單價
-var priceArr = document.querySelectorAll('.price')
-
-var priceNumberArr = [];
-var priceCountArr0 = [];
-var priceCountArr1 = [];
-var priceCountArr2 = [];
-
-var priceCountAll = [priceCountArr0, priceCountArr1, priceCountArr2]
-
+var productPrice = document.querySelectorAll('.price');
+// 歸零計算
+var productQty = 0;
+var subtotal = 0;
+// 運費及門檻
+var shipping_free = 500;
+var shippingPrice = 60;
 
 
-
-// for迴圈，對應不同的商品
-for (let index = 0; index < count.length; index++) {
-    
-
-    // 取得price的data
-    priceNumberArr.push(parseFloat(priceArr[index].dataset.price))
-    // var priceNumber = parseFloat(price).toFixed(2)
-    
-
-
-    // 數量增加
-    plus[index].onclick = function () {
-        // input跟數量顯示增加
-        parseInt(count[index].value++)
-        amount.innerHTML++
-
-        // 小計價格
-        // var priceCount = priceNumberArr[index] * parseInt(count[index].value)
-
-        for (let j = 0; j < priceCountAll.length; j++) {
-            priceCountAll[j].push(priceNumberArr[j] * parseInt(count[j].value))
-        }
-        // priceCountArr0.push(priceNumberArr[0] * parseInt(count[0].value))
-        // priceCountArr1.push(priceNumberArr[1] * parseInt(count[1].value))
-        // priceCountArr2.push(priceNumberArr[2] * parseInt(count[2].value))
-
-        var priceCount0 = priceCountArr0.pop()
-        var priceCount1 = priceCountArr1.pop()
-        var priceCount2 = priceCountArr2.pop()
-
-        var subTotalNumber = priceCount0 + priceCount1 + priceCount2
-
-        subTotal.innerHTML = '$' + subTotalNumber.toFixed(2)
-
-        // 運費
-        var shippingPrice = 24.90
-        shipping.innerHTML = '$' + shippingPrice.toFixed(2)
-
-        // 總計價格
-        var totalCostNumber = parseFloat(parseFloat(subTotalNumber) + shippingPrice).toFixed(2)
-        totalCost.innerHTML = '$' + totalCostNumber
-
-        // 價格onchange
-        priceArr[0].innerHTML = '$' + priceCount0.toFixed(2)
-        priceArr[1].innerHTML = '$' + priceCount1.toFixed(2)
-        priceArr[2].innerHTML = '$' + priceCount2.toFixed(2)
-        // console.log(typeof parseFloat(priceCount.toFixed(2)))
+// 顯示計算後所有項目更新
+function updateData() {
+    // 數量、小計歸零
+    productQty = 0;
+    subtotal = 0;
+    // 每一個商品資訊更新
+    for (let i = 0; i < product.length; i++) {
+        let subtotalNumber = (parseInt(input[i].value) * parseFloat(productPrice[i].dataset.price))
+        productPrice[i].innerHTML = '$' + subtotalNumber.toFixed(2);
+        //商品總數更新
+        productQty += parseInt(input[i].value);
+        //小計更新
+        subtotal += subtotalNumber
     }
-    
-    // 數量減少
-    minus[index].onclick = function () {
-
-        // 當數量不等於0的時候
-        if (count[index].value != 0) {
-
-            // input跟數量顯示減少
-            parseInt(count[index].value--)
-            amount.innerHTML--
-
-            // 小計價格
-            for (let j = 0; j < priceCountAll.length; j++) {
-                priceCountAll[j].push(priceNumberArr[j] * parseInt(count[j].value))
-                // console.log(priceCountAll[j]);
-            }
-            // priceCountArr0.push(priceNumberArr[0] * parseInt(count[0].value))
-            // priceCountArr1.push(priceNumberArr[1] * parseInt(count[1].value))
-            // priceCountArr2.push(priceNumberArr[2] * parseInt(count[2].value))
-
-            var priceCount0 = priceCountArr0.pop()
-            var priceCount1 = priceCountArr1.pop()
-            var priceCount2 = priceCountArr2.pop()
-
-            var subTotalNumber = priceCount0 + priceCount1 + priceCount2
-
-            subTotal.innerHTML = '$' + subTotalNumber.toFixed(2)
-            // console.log(subTotal.innerHTML);
-            // 運費
-            var shippingPrice = 24.90
-            shipping.innerHTML = '$' + shippingPrice.toFixed(2)
-
-            // 總計價格
-            var totalCostNumber = parseFloat(parseFloat(subTotalNumber.toFixed(2)) + shippingPrice).toFixed(2)
-            totalCost.innerHTML = '$' + totalCostNumber
-
-            // 價格onchange
-            priceArr[0].innerHTML = '$' + priceCount0.toFixed(2)
-            priceArr[1].innerHTML = '$' + priceCount1.toFixed(2)
-            priceArr[2].innerHTML = '$' + priceCount2.toFixed(2)
-
-        }
-        
-
-        // 當數量等於0，或初始狀態
-        if (amount.innerHTML == 0) {
-
-            // 小計、運費、總計為0
-            subTotal.innerHTML = '$' + subTotalNumber.toFixed(0)
-            shipping.innerHTML = '$' + 0
-            totalCost.innerHTML = '$' + 0
-        }
-
-    }
-
-
+    // 商品總數顯示
+    showProductQty.innerHTML = productQty
+    // 小計顯示
+    showSubtotal.innerHTML = '$' + subtotal.toFixed(2)
+    //運費更新、顯示
+    calcShipping() 
+    // 總計顯示
+    totalCost.innerHTML = '$' + (subtotal + shippingPrice).toFixed(2)
 }
 
+updateData()
+// 按下加號的event
+plus.forEach(function (ele, i) {
+    ele.addEventListener('click', function () {
+        input[i].value = parseInt(input[i].value) + 1
+        updateData()
+    })
+});
+// 按下減號的event
+minus.forEach(function (ele, i) {
+    ele.addEventListener('click', function () {
+        if (input[i].value > 1) {
+            input[i].value = parseInt(input[i].value) - 1
+            updateData()
+        }
+    })
+});
+// input onchange事件及條件限制
+input.forEach(function (ele) {
+    ele.addEventListener('change', function () {
+        if (ele.value == '' || ele.value == 0) {
+            ele.value = 1;
+        }
+        updateData();
+    })
 
-function priceOnchange() {
-    priceArr.innerHTML = priceCountArr
+    ele.addEventListener('keyup', function () {
+        ele.value = ele.value.replace(/\D+/g,'');
+    })
+    
+});
+// 運費計算及免運費條件
+function calcShipping() {
+    if (subtotal >= shipping_free) {
+        shippingPrice = 0;
+        shipping.innerHTML = '$' + shippingPrice.toFixed(2);
+    } else if (subtotal <= shipping_free) {
+        shippingPrice = 60;
+        shipping.innerHTML = '$' + shippingPrice.toFixed(2);
+    }
 }
-
-
 
 
 
